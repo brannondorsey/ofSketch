@@ -33,19 +33,22 @@ namespace Sketch {
 
 const std::string App::VERSION_SPECIAL = "";
 
-
 App::App():
-    _editorSettings(ofToDataPath("Resources/Settings/EditorSettings.json")),
+    DATA_PATH(ofToDataPath("", true)),
+    _editorSettings(Poco::Path(DATA_PATH).append(Poco::Path("Resources/Settings/EditorSettings.json", Poco::Path::PATH_UNIX)).toString(Poco::Path::PATH_NATIVE)),
     _ofSketchSettings(),
     _threadPool("ofSketchThreadPool"),
     _taskQueue(ofx::TaskQueue_<std::string>::UNLIMITED_TASKS, _threadPool),
     _compiler(_taskQueue,
-              ofToDataPath("Resources/Templates/CompilerTemplates"),
+              Poco::Path(ofToDataPath("Resources/Templates/CompilerTemplates"), Poco::Path::PATH_UNIX).toString(Poco::Path::PATH_NATIVE),
               _ofSketchSettings.getOpenFrameworksDir()),
-    _addonManager(ofToDataPath(_ofSketchSettings.getOpenFrameworksDir() + "/addons")),
-    _projectManager(ofToDataPath(_ofSketchSettings.getProjectDir(), true)),
-    _uploadRouter(ofToDataPath(_ofSketchSettings.getProjectDir(), true))
+    _addonManager(Poco::Path(ofToDataPath(_ofSketchSettings.getOpenFrameworksDir())).append(Poco::Path("addons")).toString(Poco::Path::PATH_NATIVE)),
+    _projectManager(Poco::Path(ofToDataPath(_ofSketchSettings.getProjectDir(), true)).toString(Poco::Path::PATH_NATIVE)),
+    _uploadRouter(Poco::Path(ofToDataPath(_ofSketchSettings.getProjectDir(), true)).toString(Poco::Path::PATH_NATIVE))
 {
+    
+    cout << "The data path is " << DATA_PATH << endl;
+
     ofLogNotice("App::App") << "Editor setting's projectDir: " << _ofSketchSettings.getProjectDir();
     _taskQueue.registerTaskEvents(this);
 
@@ -94,9 +97,11 @@ void App::setup()
     ofSetLogLevel(OF_LOG_VERBOSE);
 
     ofSSLManager::initializeServer(new Poco::Net::Context(Poco::Net::Context::SERVER_USE,
-                                                          ofToDataPath("ssl/privateKey.nopassword.pem"),
-                                                          ofToDataPath("ssl/selfSignedCertificate.nopassword.pem"),
-                                                          ofToDataPath("ssl/cacert.pem")));
+                                                          Poco::Path(ofToDataPath("ssl/privateKey.nopassword.pem"),
+                                                                     Poco::Path::PATH_UNIX).toString(Poco::Path::PATH_NATIVE),
+                                                          Poco::Path(ofToDataPath("ssl/selfSignedCertificate.nopassword.pem"),
+                                                                     Poco::Path::PATH_UNIX).toString(Poco::Path::PATH_NATIVE),
+                                                          Poco::Path(ofToDataPath("ssl/cacert.pem"), Poco::Path::PATH_UNIX).toString()));
 
     // TODO: configure these via settings files
 
@@ -482,7 +487,7 @@ void App::getAddonList(const void *pSender, ofx::JSONRPC::MethodArgs &args)
     {
         Json::Value addon;
         addon["name"] = (*iter)->getName();
-        addon["path"] = (*iter)->getPath();
+        addon["path"] = Poco::Path((*iter)->getPath(), Poco::Path::PATH_UNIX).toString();
         addonsJSON.append(addon);
         ++iter;
     }

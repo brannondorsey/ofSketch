@@ -29,6 +29,7 @@
 #include <string>
 #include <json/json.h>
 #include "Poco/Net/NameValueCollection.h"
+#include "Poco/Path.h"
 #include "ofxJSONElement.h"
 #include "ofxHTTP.h"
 

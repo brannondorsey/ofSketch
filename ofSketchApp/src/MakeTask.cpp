@@ -33,7 +33,7 @@ namespace Sketch {
 
 
 MakeTask::Settings::Settings():
-    ofRoot(ofToDataPath("openFrameworks")),
+    ofRoot(Poco::Path(ofToDataPath("openFrameworks"), Poco::Path::PATH_UNIX).toString()),
     numProcessors(Poco::Environment::processorCount()),
     isSilent(true),
     CXX(""),

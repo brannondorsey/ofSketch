@@ -33,6 +33,7 @@
 #include "Poco/StreamCopier.h"
 #include "Poco/PipeStream.h"
 #include "Poco/TaskManager.h"
+#include "Poco/Path.h"
 #include "ofMain.h"
 #include "ofxHTTP.h"
 #include "ofxJSONRPC.h"
@@ -140,6 +141,7 @@ public:
     };
 
     static const std::string VERSION_SPECIAL;
+    const std::string DATA_PATH;
 
 private:
     ofx::HTTP::BasicJSONRPCServer::SharedPtr server;

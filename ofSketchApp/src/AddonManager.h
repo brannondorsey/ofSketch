@@ -45,6 +45,7 @@ namespace Sketch {
 class AddonManager
 {
 public:
+    AddonManager(){};
     AddonManager(const std::string& addonsPath);
     virtual ~AddonManager();
 

@@ -30,13 +30,14 @@ namespace Sketch {
 
 
 OfSketchSettings::OfSketchSettings():
-    _templateSettingsFilePath(ofToDataPath("Resources/Settings/OfSketchSettings.json")),
+    _templateSettingsFilePath(Poco::Path(ofToDataPath("Resources/Settings/OfSketchSettings.json"), Poco::Path::PATH_UNIX).toString()),
     _path(_templateSettingsFilePath)
 {
     
     if (Poco::Environment::has("HOME")) {
         
-        ofFile settingsFile = Poco::Environment::get("HOME") + "/.ofsketchsettings.json";
+        Poco::Path path(Poco::Environment::get("HOME") + "/.ofsketchsettings.json", Poco::Path::PATH_UNIX);
+        ofFile settingsFile(path.toString());
         
         _path = settingsFile.getAbsolutePath();
         
@@ -62,10 +63,12 @@ bool OfSketchSettings::load(const std::string& path)
     if(_data.open(path)) {
         
         std::string projectDir = _data["projectDir"].asString();
-        _data["projectDir"] = ofToDataPath(projectDir, true);
+        Poco::Path path(ofToDataPath(projectDir, true));
+        _data["projectDir"] = path.toString();
         
         std::string openFrameworksDir = _data["openFrameworksDir"].asString();
-        _data["openFrameworksDir"] = ofToDataPath(openFrameworksDir, true);
+        path = Poco::Path(ofToDataPath(openFrameworksDir, true));
+        _data["openFrameworksDir"] = path.toString();
         
         ofLogVerbose("OfSketchSettings::load") << _data["projectDir"].asString();
         ofLogVerbose("OfSketchSettings::load") << _data["openFrameworksDir"].asString();

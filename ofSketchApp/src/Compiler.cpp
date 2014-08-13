@@ -35,8 +35,8 @@ Compiler::Compiler(ProcessTaskQueue& taskQueue,
                    const std::string& openFrameworksDir):
     _taskQueue(taskQueue),
     _pathToTemplates(pathToTemplates),
-    _projectFileTemplate(ofBufferFromFile(ofToDataPath(_pathToTemplates + "/main.tmpl")).getText()),
-    _classTemplate(ofBufferFromFile(ofToDataPath(_pathToTemplates + "/class.tmpl")).getText()),
+    _projectFileTemplate(ofBufferFromFile(Poco::Path(ofToDataPath(_pathToTemplates + "/main.tmpl"), Poco::Path::PATH_UNIX).toString()).getText()),
+    _classTemplate(ofBufferFromFile(Poco::Path(ofToDataPath(_pathToTemplates + "/class.tmpl"), Poco::Path::PATH_UNIX).toString()).getText()),
     _openFrameworksDir(openFrameworksDir)
 {
 }
@@ -58,7 +58,9 @@ Poco::UUID Compiler::run(const Project& project)
 
 void Compiler::generateSourceFiles(const Project& project)
 {
-    ofDirectory src(project.getPath() + "/src");
+    
+    Poco::Path path(project.getPath() + "/src", Poco::Path::PATH_UNIX);
+    ofDirectory src(path.toString());
     src.remove(true);
     src.create(true);
 
@@ -68,7 +70,9 @@ void Compiler::generateSourceFiles(const Project& project)
     ofStringReplace(projectFile, "<projectname>", projectData["projectFile"]["name"].asString());
     _replaceIncludes(projectFile);
     ofBuffer sourceBuffer(projectFile);
-    ofBufferToFile(src.getAbsolutePath() + "/main.cpp", sourceBuffer);
+    
+    path = Poco::Path(src.getAbsolutePath() + "/main.cpp", Poco::Path::PATH_UNIX);
+    ofBufferToFile(path.toString(), sourceBuffer);
 
     if (project.hasClasses())
     {
@@ -82,7 +86,8 @@ void Compiler::generateSourceFiles(const Project& project)
             _replaceIncludes(classFile);
             
             ofBuffer sourceBuffer(classFile);
-            ofBufferToFile(src.getAbsolutePath() + "/" + c["name"].asString() + ".h", sourceBuffer);
+            path = Poco::Path(src.getAbsolutePath() + "/" + c["name"].asString() + ".h", Poco::Path::PATH_UNIX);
+            ofBufferToFile(path.toString(), sourceBuffer);
         }
     }
 }

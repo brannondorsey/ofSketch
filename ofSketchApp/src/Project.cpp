@@ -44,13 +44,15 @@ Project::Project(const std::string& path): _path(path), _isLoaded(false)
 {
     // this is not efficient at all! I am just keeping these FileTemplate loads in the project
     // constructor because it makes the most sense architecure wise.
-    _classFileTemplate = ofBufferFromFile(ofToDataPath("Resources/Templates/SketchTemplates/class.tmpl")).getText();
+    Poco::Path p(ofToDataPath("Resources/Templates/SketchTemplates/class.tmpl"), Poco::Path::PATH_UNIX);
+    _classFileTemplate = ofBufferFromFile(p.toString()).getText();
     load(_path, getName());
 }
 
 void Project::load(const std::string& path, const std::string& name)
 {
-    _sketchDir = ofDirectory(ofToDataPath(path + "/sketch"));
+    Poco::Path p(ofToDataPath(path + "/sketch"), Poco::Path::PATH_UNIX);
+    _sketchDir = ofDirectory(p.toString());
 
     _data.clear();
 
@@ -152,8 +154,11 @@ bool Project::create(const std::string& path)
 
     if (!project.exists()) 
     {
-        ofDirectory temp(ofToDataPath("Resources/Templates/SimpleTemplate"));
-        temp.copyTo(ofToDataPath(path));
+        Poco::Path p(ofToDataPath("Resources/Templates/SimpleTemplate"), Poco::Path::PATH_UNIX);
+        ofDirectory temp(p.toString());
+        
+        p = Poco::Path(ofToDataPath(path), Poco::Path::PATH_UNIX);
+        temp.copyTo(p.toString());
         return true;
     }
 
@@ -184,8 +189,10 @@ bool Project::rename(const std::string& newName)
 
         _path = projectDir.getAbsolutePath();
 
-        ofFile projectFile(projectDir.getAbsolutePath() + "/sketch/" + oldProjectName + "." + SKETCH_FILE_EXTENSION);
-        
+        Poco::Path p(projectDir.getAbsolutePath());
+        p.pushDirectory("sketch");
+        p.setFileName(oldProjectName + "." + SKETCH_FILE_EXTENSION);
+        ofFile projectFile(p.toString(Poco::Path::PATH_NATIVE));
         
         // remove old executable
         ofDirectory bin;

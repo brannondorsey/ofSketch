@@ -36,12 +36,13 @@ const std::string AddonManager::DEFAULT_ADDON_PATH = "addons/";
 AddonManager::AddonManager(const std::string& path):
     _path(path)
 {
-    Poco::Path fullPath(ofToDataPath(_path, true));
+    Poco::Path fullPath(ofToDataPath(_path, true), Poco::Path::PATH_UNIX);
 
     Poco::File file(fullPath);
-
+    std::cout << "Addon manager path: " << fullPath.toString() << std::endl;
     if (!file.exists())
     {
+        std::cout << fullPath.toString() << std::endl;
         Poco::FileNotFoundException exc(fullPath.toString());
         throw exc;
     }

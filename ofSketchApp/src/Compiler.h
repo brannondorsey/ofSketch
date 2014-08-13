@@ -34,6 +34,7 @@
 #include "Poco/StreamCopier.h"
 #include "Poco/PipeStream.h"
 #include "Poco/RegularExpression.h"
+#include "Poco/Path.h"
 #include "ofTypes.h"
 #include "Project.h"
 #include "ofMain.h"

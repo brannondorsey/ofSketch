@@ -49,17 +49,17 @@ bool UploadRouter::onHTTPFormEvent(ofx::HTTP::PostFormEventArgs& args)
     
     UploadRouter::UploadedFile uploadedFile = _uploadedFiles[args.getPostId().toString()];
     ofFile tempFile(uploadedFile.tempFilename);
-    
-    ofLogNotice("UploadRouter::onHTTPFormEvent") << "Project path" << _path << "/" << projectName;
 
-    ofDirectory project(_path + "/" + projectName);
+    Poco::Path path(_path + "/" + projectName, Poco::Path::PATH_UNIX);
+    ofDirectory project(path.toString());
     
     Json::Value result;
     
     if (project.exists() &&
         !uploadedFile.filename.empty())
     {
-        tempFile.renameTo(project.getAbsolutePath() + "/bin/data/" + uploadedFile.filename, false, true);
+        path = Poco::Path(project.getAbsolutePath() + "/bin/data/" + uploadedFile.filename, Poco::Path::PATH_UNIX);
+        tempFile.renameTo(path.toString(), false, true);
         ofx::HTTP::Utils::dumpNameValueCollection(args.getForm(), ofGetLogLevel());
     }
     
