@@ -544,7 +544,7 @@ $(document).ready( function()
     var alertBox;
     var aceWrapperHeight;
     var compileSuccess = false; // this is a terrible global var. Get it out ASAP.
-    var inputRegex = /^[A-Za-z0-9_-]+$/;
+    var inputRegex = /^[A-Za-z0-9_\-\.]+$/;
 
     JSONRPCClient = new $.JsonRpcClient({ 
             ajaxUrl: getDefaultPostURL(),

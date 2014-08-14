@@ -63,23 +63,48 @@ void Compiler::generateSourceFiles(const Project& project)
     src.create(true);
 
     Json::Value projectData = project.getData();
-    std::string projectFile = _projectFileTemplate;
-    ofStringReplace(projectFile, "<projectfile>", projectData["projectFile"]["fileContents"].asString());
-    ofStringReplace(projectFile, "<projectname>", projectData["projectFile"]["name"].asString());
-    _replaceIncludes(projectFile);
+    
+    Poco::RegularExpression cppExpression(".+\\.cpp$", Poco::RegularExpression::RE_ANCHORED);
+    std::string projectFile;
+    
+    if (cppExpression.match(projectData["projectFile"]["name"].asString()))
+    {
+        ofLogNotice("Compiler::generateSourceFiles") << "Project file " << projectData["projectFile"]["name"].asString() << " matches .cpp regex" << endl;
+        projectFile = projectData["projectFile"]["fileContents"].asString();
+    }
+    else
+    {
+        projectFile = _projectFileTemplate;
+        ofStringReplace(projectFile, "<projectfile>", projectData["projectFile"]["fileContents"].asString());
+        ofStringReplace(projectFile, "<projectname>", projectData["projectFile"]["name"].asString());
+        _replaceIncludes(projectFile);
+    }
+    
     ofBuffer sourceBuffer(projectFile);
     ofBufferToFile(src.getAbsolutePath() + "/main.cpp", sourceBuffer);
 
     if (project.hasClasses())
     {
+        Poco::RegularExpression hExpression(".+\\.h$", Poco::RegularExpression::RE_ANCHORED);
+        
         for (unsigned int i = 0; i < projectData["classes"].size(); ++i)
         {
             Json::Value c = projectData["classes"][i];
+            std::string classFile;
             
-            std::string classFile = _classTemplate;
-            ofStringReplace(classFile, "<classname>", c["name"].asString());
-            ofStringReplace(classFile, "<classfile>", c["fileContents"].asString());
-            _replaceIncludes(classFile);
+            if (hExpression.match(c["name"].asString()))
+            {
+                classFile = c["fileContents"].asString();
+                ofLogNotice("Compiler::generateSourceFiles") << "Class file " << c["name"] << " matches .h regex" << endl;
+            }
+            else
+            {
+                classFile = _classTemplate;
+                ofStringReplace(classFile, "<classname>", c["name"].asString());
+                ofStringReplace(classFile, "<classfile>", c["fileContents"].asString());
+                _replaceIncludes(classFile);
+            }
+            
             
             ofBuffer sourceBuffer(classFile);
             ofBufferToFile(src.getAbsolutePath() + "/" + c["name"].asString() + ".h", sourceBuffer);

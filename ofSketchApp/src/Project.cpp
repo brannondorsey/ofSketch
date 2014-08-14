@@ -66,14 +66,15 @@ void Project::load(const std::string& path, const std::string& name)
         {
             ofFile file = files[i];
 
-            if (file.getBaseName() == name)
+            if ((file.getBaseName() == name && file.getExtension() == SKETCH_FILE_EXTENSION) ||
+                (file.getBaseName() == name && file.getExtension() == ".h"))
             {
                 file.open(file.getAbsolutePath());
                 _data["projectFile"]["name"] = file.getBaseName();
                 _data["projectFile"]["fileName"] = file.getFileName();
                 _data["projectFile"]["fileContents"] = file.readToBuffer().getText();
             } 
-            else if (file.getExtension() == SKETCH_FILE_EXTENSION)
+            else
             {
                 file.open(file.getAbsolutePath());
                 _data["classes"][classCounter]["name"] = file.getBaseName();
